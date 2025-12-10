@@ -1,0 +1,2156 @@
+{
+  "apiInfo": {
+    "title": "FF 1ONLYSARKAR SHOP API Documentation",
+    "version": "1.0.0",
+    "description": "Complete API documentation for FF 1ONLYSARKAR SHOP - Your trusted source for Free Fire emotes and premium services",
+    "baseUrl": ""
+  },
+  "categories": [
+    {
+      "id": "emotes",
+      "name": "Emotes",
+      "description": "Endpoints for managing and sending emotes",
+      "icon": "Smile",
+      "endpoints": [
+        {
+          "id": "get-emotes",
+          "name": "Get All Emotes",
+          "method": "GET",
+          "path": "/api/emotes",
+          "description": "Retrieves a list of all available emotes. Supports optional limit parameter for pagination.",
+          "authentication": false,
+          "parameters": [
+            {
+              "name": "limit",
+              "type": "number",
+              "required": false,
+              "location": "query",
+              "description": "Maximum number of emotes to return"
+            }
+          ],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Success",
+              "example": "[{\"id\": \"123456789\", \"url\": \"https://example.com/emote.gif\"}]"
+            },
+            {
+              "status": 404,
+              "description": "Emotes file not found",
+              "example": "{\"error\": \"Emotes file not found\"}"
+            },
+            {
+              "status": 500,
+              "description": "Server error",
+              "example": "{\"error\": \"Failed to load emotes\"}"
+            }
+          ]
+        },
+        {
+          "id": "send-emote",
+          "name": "Send Emote",
+          "method": "POST",
+          "path": "/api/send-emote",
+          "description": "Sends an emote to a Free Fire account. Includes rate limiting, daily limits for free users, and premium bypass.",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "uid",
+                "type": "string",
+                "required": true,
+                "description": "Free Fire User ID (5-20 characters, numeric only)"
+              },
+              {
+                "name": "teamCode",
+                "type": "string",
+                "required": true,
+                "description": "Team code (4-20 characters)"
+              },
+              {
+                "name": "emoteCode",
+                "type": "string",
+                "required": true,
+                "description": "Emote code (8-12 digit numeric string)"
+              }
+            ],
+            "example": "{\"uid\": \"1234567890\", \"teamCode\": \"TEAM123\", \"emoteCode\": \"123456789\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Emote sent successfully",
+              "example": "{\"success\": true, \"message\": \"Emote sent successfully\", \"isPremium\": false, \"cooldownSeconds\": 30, \"dailyStats\": {\"used\": 1, \"remaining\": 9, \"total\": 10}}"
+            },
+            {
+              "status": 400,
+              "description": "Invalid input",
+              "example": "{\"error\": \"Invalid UID format\"}"
+            },
+            {
+              "status": 403,
+              "description": "UID blocked",
+              "example": "{\"error\": \"Access Denied\", \"blocked\": true, \"blockMessage\": \"Your account has been blocked\"}"
+            },
+            {
+              "status": 429,
+              "description": "Daily limit reached",
+              "example": "{\"error\": \"Daily limit reached\", \"limitReached\": true, \"dailyStats\": {}}"
+            },
+            {
+              "status": 500,
+              "description": "Server error",
+              "example": "{\"error\": \"Failed to send emote\"}"
+            },
+            {
+              "status": 504,
+              "description": "Request timeout",
+              "example": "{\"error\": \"Request timeout. Please try again.\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "user-status",
+      "name": "User Status",
+      "description": "Check whitelist, blocklist, and daily usage status",
+      "icon": "User",
+      "endpoints": [
+        {
+          "id": "check-whitelist",
+          "name": "Check Whitelist Status",
+          "method": "POST",
+          "path": "/api/whitelist/check",
+          "description": "Check if a UID is whitelisted (has premium access)",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "uid",
+                "type": "string",
+                "required": true,
+                "description": "User ID to check"
+              }
+            ],
+            "example": "{\"uid\": \"1234567890\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Whitelist status",
+              "example": "{\"whitelisted\": true, \"expiresAt\": 1735689600000, \"planId\": \"monthly\", \"planName\": \"Monthly Premium\"}"
+            },
+            {
+              "status": 400,
+              "description": "Invalid UID",
+              "example": "{\"error\": \"Invalid UID\"}"
+            }
+          ]
+        },
+        {
+          "id": "check-blocklist",
+          "name": "Check Blocklist Status",
+          "method": "POST",
+          "path": "/api/blocklist/check",
+          "description": "Check if a UID is blocked from using the service",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "uid",
+                "type": "string",
+                "required": true,
+                "description": "User ID to check"
+              }
+            ],
+            "example": "{\"uid\": \"1234567890\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Block status",
+              "example": "{\"blocked\": false}"
+            },
+            {
+              "status": 400,
+              "description": "Invalid UID",
+              "example": "{\"error\": \"Invalid UID\"}"
+            }
+          ]
+        },
+        {
+          "id": "daily-stats",
+          "name": "Get Daily Usage Stats",
+          "method": "POST",
+          "path": "/api/daily-stats",
+          "description": "Get daily usage statistics for a UID",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "uid",
+                "type": "string",
+                "required": true,
+                "description": "User ID"
+              }
+            ],
+            "example": "{\"uid\": \"1234567890\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Usage statistics",
+              "example": "{\"used\": 3, \"remaining\": 7, \"total\": 10, \"resetsAt\": 1735776000000}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "settings",
+      "name": "Settings & Configuration",
+      "description": "Get public site settings and configurations",
+      "icon": "Settings",
+      "endpoints": [
+        {
+          "id": "get-settings",
+          "name": "Get Site Settings",
+          "method": "GET",
+          "path": "/api/settings",
+          "description": "Retrieves public site settings including navigation and footer configuration",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Site settings",
+              "example": "{\"siteName\": \"FF 1ONLYSARKAR SHOP\", \"navigation\": [...], \"footer\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "get-footer-config",
+          "name": "Get Footer Configuration",
+          "method": "GET",
+          "path": "/api/footer-config/public",
+          "description": "Get public footer configuration including company info, sections, and social links",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Footer configuration",
+              "example": "{\"companyInfo\": {...}, \"sections\": [...], \"socialLinks\": [...], \"bottomText\": {...}}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blog",
+      "name": "Blog",
+      "description": "Public blog endpoints",
+      "icon": "BookOpen",
+      "endpoints": [
+        {
+          "id": "get-public-blogs",
+          "name": "Get Published Blog Posts",
+          "method": "GET",
+          "path": "/api/blog/public",
+          "description": "Retrieves all published blog posts",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "List of published posts",
+              "example": "{\"posts\": [{\"id\": \"1\", \"title\": \"Post Title\", \"slug\": \"post-slug\", \"excerpt\": \"...\", \"published\": true}]}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "custom-pages",
+      "name": "Custom Pages",
+      "description": "Public custom pages endpoints",
+      "icon": "FileText",
+      "endpoints": [
+        {
+          "id": "get-custom-pages",
+          "name": "Get Custom Pages",
+          "method": "GET",
+          "path": "/api/custom-pages/public",
+          "description": "Get published custom pages. Optionally get a specific page by slug.",
+          "authentication": false,
+          "parameters": [
+            {
+              "name": "slug",
+              "type": "string",
+              "required": false,
+              "location": "query",
+              "description": "Page slug to retrieve specific page"
+            }
+          ],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Custom pages list or single page",
+              "example": "{\"pages\": [{\"id\": \"1\", \"title\": \"Page Title\", \"slug\": \"page-slug\", \"content\": \"...\"}]}"
+            },
+            {
+              "status": 404,
+              "description": "Page not found",
+              "example": "{\"error\": \"Page not found\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "payments",
+      "name": "Payments (Razorpay)",
+      "description": "Payment processing endpoints for premium subscriptions",
+      "icon": "CreditCard",
+      "endpoints": [
+        {
+          "id": "get-plans",
+          "name": "Get Available Plans",
+          "method": "GET",
+          "path": "/api/razorpay/plans",
+          "description": "Get all available premium subscription plans",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "List of plans",
+              "example": "{\"enabled\": true, \"plans\": [{\"id\": \"monthly\", \"name\": \"Monthly Premium\", \"price\": 99, \"currency\": \"INR\", \"duration\": 2592000}]}"
+            }
+          ]
+        },
+        {
+          "id": "create-order",
+          "name": "Create Payment Order",
+          "method": "POST",
+          "path": "/api/razorpay/create-order",
+          "description": "Create a new Razorpay order for premium subscription. Includes rate limiting and duplicate order prevention.",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "planId",
+                "type": "string",
+                "required": true,
+                "description": "ID of the plan to purchase"
+              },
+              {
+                "name": "uid",
+                "type": "string",
+                "required": true,
+                "description": "Free Fire UID to whitelist (5-20 numeric characters)"
+              }
+            ],
+            "example": "{\"planId\": \"monthly\", \"uid\": \"1234567890\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Order created",
+              "example": "{\"orderId\": \"order_xyz\", \"amount\": 9900, \"currency\": \"INR\", \"keyId\": \"rzp_xxx\"}"
+            },
+            {
+              "status": 400,
+              "description": "Invalid input or UID already has premium",
+              "example": "{\"error\": \"This UID already has premium access until ...\"}"
+            },
+            {
+              "status": 429,
+              "description": "Rate limit exceeded",
+              "example": "{\"error\": \"Too many payment attempts. Please wait before trying again.\"}"
+            },
+            {
+              "status": 503,
+              "description": "Payment system disabled",
+              "example": "{\"error\": \"Premium feature is currently disabled\"}"
+            }
+          ]
+        },
+        {
+          "id": "create-payment-link",
+          "name": "Create Payment Link",
+          "method": "POST",
+          "path": "/api/razorpay/create-payment-link",
+          "description": "Create a Razorpay payment link for premium subscription",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "planId",
+                "type": "string",
+                "required": true,
+                "description": "ID of the plan"
+              },
+              {
+                "name": "uid",
+                "type": "string",
+                "required": true,
+                "description": "Free Fire UID"
+              }
+            ],
+            "example": "{\"planId\": \"monthly\", \"uid\": \"1234567890\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Payment link created",
+              "example": "{\"success\": true, \"paymentLinkId\": \"plink_xxx\", \"paymentUrl\": \"https://rzp.io/xxx\", \"sessionToken\": \"abc123\"}"
+            }
+          ]
+        },
+        {
+          "id": "verify-payment",
+          "name": "Verify Payment",
+          "method": "POST",
+          "path": "/api/razorpay/verify-payment",
+          "description": "Verify payment signature and activate premium subscription. Uses cryptographic signature verification.",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "razorpay_order_id",
+                "type": "string",
+                "required": true,
+                "description": "Razorpay order ID"
+              },
+              {
+                "name": "razorpay_payment_id",
+                "type": "string",
+                "required": true,
+                "description": "Razorpay payment ID"
+              },
+              {
+                "name": "razorpay_signature",
+                "type": "string",
+                "required": true,
+                "description": "Razorpay signature for verification"
+              }
+            ],
+            "example": "{\"razorpay_order_id\": \"order_xxx\", \"razorpay_payment_id\": \"pay_xxx\", \"razorpay_signature\": \"xxx\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Payment verified and UID whitelisted",
+              "example": "{\"success\": true, \"message\": \"UID xxx has been whitelisted for Monthly Premium\", \"expiresAt\": 1735689600000}"
+            },
+            {
+              "status": 400,
+              "description": "Invalid signature or already processed",
+              "example": "{\"error\": \"Payment verification failed. Invalid signature.\", \"success\": false}"
+            }
+          ]
+        },
+        {
+          "id": "check-payment-status",
+          "name": "Check Payment Status",
+          "method": "POST",
+          "path": "/api/razorpay/check-payment-status",
+          "description": "Check status of a payment link payment",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "paymentLinkId",
+                "type": "string",
+                "required": true,
+                "description": "Payment link ID"
+              },
+              {
+                "name": "sessionToken",
+                "type": "string",
+                "required": true,
+                "description": "Session token from payment link creation"
+              }
+            ],
+            "example": "{\"paymentLinkId\": \"plink_xxx\", \"sessionToken\": \"abc123\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Payment status",
+              "example": "{\"status\": \"paid\", \"success\": true, \"message\": \"Payment successful!\", \"uid\": \"1234567890\", \"planName\": \"Monthly Premium\"}"
+            }
+          ]
+        },
+        {
+          "id": "razorpay-webhook",
+          "name": "Razorpay Webhook",
+          "method": "POST",
+          "path": "/api/razorpay/webhook",
+          "description": "Webhook endpoint for Razorpay payment notifications. Handles payment.captured, payment.failed, and order.paid events.",
+          "authentication": true,
+          "authNote": "Requires Razorpay webhook signature validation",
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "event",
+                "type": "string",
+                "required": true,
+                "description": "Event type (payment.captured, payment.failed, order.paid)"
+              },
+              {
+                "name": "payload",
+                "type": "object",
+                "required": true,
+                "description": "Event payload from Razorpay"
+              }
+            ],
+            "example": "{\"event\": \"payment.captured\", \"payload\": {...}}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Webhook processed",
+              "example": "{\"status\": \"ok\"}"
+            },
+            {
+              "status": 401,
+              "description": "Invalid signature",
+              "example": "{\"error\": \"Invalid signature\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-auth",
+      "name": "Admin Authentication",
+      "description": "Admin login, logout, and 2FA endpoints",
+      "icon": "Lock",
+      "requiresAuth": true,
+      "endpoints": [
+        {
+          "id": "admin-login",
+          "name": "Admin Login",
+          "method": "POST",
+          "path": "/api/admin/login",
+          "description": "Authenticate as admin. Returns 2FA requirement if enabled.",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "username",
+                "type": "string",
+                "required": true,
+                "description": "Admin username"
+              },
+              {
+                "name": "password",
+                "type": "string",
+                "required": true,
+                "description": "Admin password"
+              }
+            ],
+            "example": "{\"username\": \"admin\", \"password\": \"password123\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Login successful or 2FA required",
+              "example": "{\"success\": true, \"requires2FA\": true, \"message\": \"Please enter your 2FA code\"}"
+            },
+            {
+              "status": 401,
+              "description": "Invalid credentials",
+              "example": "{\"error\": \"Invalid credentials\"}"
+            }
+          ]
+        },
+        {
+          "id": "admin-verify-2fa",
+          "name": "Verify 2FA Code",
+          "method": "POST",
+          "path": "/api/admin/login/verify-2fa",
+          "description": "Complete login with 2FA verification code",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "token",
+                "type": "string",
+                "required": true,
+                "description": "6-digit 2FA code from authenticator app"
+              }
+            ],
+            "example": "{\"token\": \"123456\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "2FA verified",
+              "example": "{\"success\": true, \"message\": \"Login successful\"}"
+            },
+            {
+              "status": 400,
+              "description": "Invalid code",
+              "example": "{\"error\": \"Invalid 2FA code. Please try again.\"}"
+            }
+          ]
+        },
+        {
+          "id": "admin-logout",
+          "name": "Admin Logout",
+          "method": "POST",
+          "path": "/api/admin/logout",
+          "description": "End admin session",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Logged out",
+              "example": "{\"success\": true, \"message\": \"Logged out successfully\"}"
+            }
+          ]
+        },
+        {
+          "id": "admin-check",
+          "name": "Check Admin Status",
+          "method": "GET",
+          "path": "/api/admin/check",
+          "description": "Check if current session is authenticated as admin",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Admin status",
+              "example": "{\"isAdmin\": true, \"username\": \"admin\"}"
+            }
+          ]
+        },
+        {
+          "id": "2fa-generate",
+          "name": "Generate 2FA Secret",
+          "method": "GET",
+          "path": "/api/admin/2fa/generate",
+          "description": "Generate new 2FA secret and QR code for setup",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "2FA setup data",
+              "example": "{\"success\": true, \"secret\": \"JBSWY3DPEHPK3PXP\", \"qrCode\": \"data:image/png;base64,...\", \"otpauthUrl\": \"otpauth://...\"}"
+            }
+          ]
+        },
+        {
+          "id": "2fa-verify",
+          "name": "Enable 2FA",
+          "method": "POST",
+          "path": "/api/admin/2fa/verify",
+          "description": "Verify and enable 2FA with secret and token",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "secret",
+                "type": "string",
+                "required": true,
+                "description": "2FA secret from generate endpoint"
+              },
+              {
+                "name": "token",
+                "type": "string",
+                "required": true,
+                "description": "6-digit code from authenticator app"
+              }
+            ],
+            "example": "{\"secret\": \"JBSWY3DPEHPK3PXP\", \"token\": \"123456\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "2FA enabled",
+              "example": "{\"success\": true, \"message\": \"2FA enabled successfully\"}"
+            }
+          ]
+        },
+        {
+          "id": "2fa-status",
+          "name": "Get 2FA Status",
+          "method": "GET",
+          "path": "/api/admin/2fa/status",
+          "description": "Check if 2FA is currently enabled",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "2FA status",
+              "example": "{\"enabled\": true, \"username\": \"admin\"}"
+            }
+          ]
+        },
+        {
+          "id": "2fa-disable",
+          "name": "Disable 2FA",
+          "method": "POST",
+          "path": "/api/admin/2fa/disable",
+          "description": "Disable 2FA (requires current 2FA token)",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "token",
+                "type": "string",
+                "required": true,
+                "description": "Current 2FA code to confirm"
+              }
+            ],
+            "example": "{\"token\": \"123456\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "2FA disabled",
+              "example": "{\"success\": true, \"message\": \"2FA disabled successfully\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-dashboard",
+      "name": "Admin Dashboard",
+      "description": "Dashboard statistics and overview",
+      "icon": "LayoutDashboard",
+      "requiresAuth": true,
+      "endpoints": [
+        {
+          "id": "dashboard-stats",
+          "name": "Get Dashboard Statistics",
+          "method": "GET",
+          "path": "/api/admin/dashboard/stats",
+          "description": "Get comprehensive dashboard statistics including emote logs, payments, and user counts",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Dashboard statistics",
+              "example": "{\"totalEmotes\": 100, \"totalWhitelisted\": 50, \"totalPayments\": 25, \"recentLogs\": [...]}"
+            },
+            {
+              "status": 401,
+              "description": "Unauthorized",
+              "example": "{\"error\": \"Unauthorized\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-emotes",
+      "name": "Admin Emote Management",
+      "description": "CRUD operations for emotes",
+      "icon": "Image",
+      "requiresAuth": true,
+      "endpoints": [
+        {
+          "id": "admin-get-emotes",
+          "name": "Get All Emotes (Admin)",
+          "method": "GET",
+          "path": "/api/admin/emotes",
+          "description": "Get paginated list of emotes with search capability",
+          "authentication": true,
+          "parameters": [
+            {
+              "name": "page",
+              "type": "number",
+              "required": false,
+              "location": "query",
+              "description": "Page number (default: 1)"
+            },
+            {
+              "name": "limit",
+              "type": "number",
+              "required": false,
+              "location": "query",
+              "description": "Items per page (default: 50)"
+            },
+            {
+              "name": "search",
+              "type": "string",
+              "required": false,
+              "location": "query",
+              "description": "Search by ID or URL"
+            }
+          ],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Paginated emotes list",
+              "example": "{\"emotes\": [...], \"pagination\": {\"page\": 1, \"limit\": 50, \"total\": 100, \"totalPages\": 2}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-add-emote",
+          "name": "Add Emote",
+          "method": "POST",
+          "path": "/api/admin/emotes",
+          "description": "Add a single emote or bulk import emotes",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "id",
+                "type": "string",
+                "required": false,
+                "description": "Emote code (numeric string)"
+              },
+              {
+                "name": "url",
+                "type": "string",
+                "required": false,
+                "description": "Emote image URL"
+              },
+              {
+                "name": "bulk",
+                "type": "array",
+                "required": false,
+                "description": "Array of {id, url} objects for bulk import"
+              }
+            ],
+            "example": "{\"id\": \"123456789\", \"url\": \"https://example.com/emote.gif\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Emote(s) added",
+              "example": "{\"success\": true, \"emote\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-emote",
+          "name": "Update Emote",
+          "method": "PUT",
+          "path": "/api/admin/emotes",
+          "description": "Update an existing emote",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "oldId",
+                "type": "string",
+                "required": true,
+                "description": "Current emote ID"
+              },
+              {
+                "name": "newId",
+                "type": "string",
+                "required": true,
+                "description": "New emote ID"
+              },
+              {
+                "name": "url",
+                "type": "string",
+                "required": true,
+                "description": "New emote URL"
+              }
+            ],
+            "example": "{\"oldId\": \"123456789\", \"newId\": \"987654321\", \"url\": \"https://example.com/new.gif\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Emote updated",
+              "example": "{\"success\": true, \"emote\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-delete-emote",
+          "name": "Delete Emote",
+          "method": "DELETE",
+          "path": "/api/admin/emotes",
+          "description": "Delete an emote by ID",
+          "authentication": true,
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": true,
+              "location": "query",
+              "description": "Emote ID to delete"
+            }
+          ],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Emote deleted",
+              "example": "{\"success\": true}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-whitelist",
+      "name": "Admin Whitelist & Blocklist",
+      "description": "Manage premium users and blocked UIDs",
+      "icon": "Shield",
+      "requiresAuth": true,
+      "endpoints": [
+        {
+          "id": "admin-get-whitelist",
+          "name": "Get Whitelist & Settings",
+          "method": "GET",
+          "path": "/api/admin/whitelist",
+          "description": "Get all whitelisted UIDs, blocked UIDs, and rate limit settings",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Whitelist data",
+              "example": "{\"uids\": [...], \"blockedUids\": [...], \"cooldownSeconds\": 30, \"dailyLimit\": 10}"
+            }
+          ]
+        },
+        {
+          "id": "admin-manage-whitelist",
+          "name": "Manage Whitelist",
+          "method": "POST",
+          "path": "/api/admin/whitelist",
+          "description": "Add, remove, or extend whitelist entries. Also manage blocked UIDs and rate limits.",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "action",
+                "type": "string",
+                "required": true,
+                "description": "Action: add, remove, extend, cleanup, setCooldown, setDailyLimit, addBlocked, removeBlocked, updateBlocked"
+              },
+              {
+                "name": "uid",
+                "type": "string",
+                "required": false,
+                "description": "User ID (for add, remove, extend, block actions)"
+              },
+              {
+                "name": "durationSeconds",
+                "type": "number",
+                "required": false,
+                "description": "Subscription duration in seconds (for add)"
+              },
+              {
+                "name": "planId",
+                "type": "string",
+                "required": false,
+                "description": "Plan ID (for add)"
+              },
+              {
+                "name": "planName",
+                "type": "string",
+                "required": false,
+                "description": "Plan name (for add)"
+              },
+              {
+                "name": "additionalSeconds",
+                "type": "number",
+                "required": false,
+                "description": "Seconds to extend or cooldown value"
+              },
+              {
+                "name": "dailyLimit",
+                "type": "number",
+                "required": false,
+                "description": "Daily limit for free users"
+              },
+              {
+                "name": "blockMessage",
+                "type": "string",
+                "required": false,
+                "description": "Message shown to blocked user"
+              },
+              {
+                "name": "blockReason",
+                "type": "string",
+                "required": false,
+                "description": "Internal reason for block"
+              }
+            ],
+            "example": "{\"action\": \"add\", \"uid\": \"1234567890\", \"durationSeconds\": 2592000, \"planId\": \"monthly\", \"planName\": \"Monthly\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Action completed",
+              "example": "{\"success\": true}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-plans",
+      "name": "Admin Plans Management",
+      "description": "Manage premium subscription plans",
+      "icon": "Package",
+      "requiresAuth": true,
+      "endpoints": [
+        {
+          "id": "admin-get-plans",
+          "name": "Get All Plans",
+          "method": "GET",
+          "path": "/api/admin/plans",
+          "description": "Get all premium subscription plans",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Plans list",
+              "example": "{\"plans\": [{\"id\": \"monthly\", \"name\": \"Monthly\", \"price\": 99, \"currency\": \"INR\", \"duration\": 2592000}]}"
+            }
+          ]
+        },
+        {
+          "id": "admin-manage-plans",
+          "name": "Manage Plans",
+          "method": "POST",
+          "path": "/api/admin/plans",
+          "description": "Add, update, or delete premium plans",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "action",
+                "type": "string",
+                "required": true,
+                "description": "Action: add, update, delete"
+              },
+              {
+                "name": "plan",
+                "type": "object",
+                "required": false,
+                "description": "Plan object with id, name, duration, price, currency"
+              },
+              {
+                "name": "planId",
+                "type": "string",
+                "required": false,
+                "description": "Plan ID for update/delete"
+              }
+            ],
+            "example": "{\"action\": \"add\", \"plan\": {\"id\": \"weekly\", \"name\": \"Weekly\", \"price\": 49, \"currency\": \"INR\", \"duration\": 604800}}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Action completed",
+              "example": "{\"success\": true}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-blog",
+      "name": "Admin Blog Management",
+      "description": "Manage blog posts",
+      "icon": "Edit",
+      "requiresAuth": true,
+      "endpoints": [
+        {
+          "id": "admin-get-blog",
+          "name": "Get All Blog Posts",
+          "method": "GET",
+          "path": "/api/admin/blog",
+          "description": "Get all blog posts (including drafts)",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Blog posts",
+              "example": "{\"posts\": [...]}"
+            }
+          ]
+        },
+        {
+          "id": "admin-create-blog",
+          "name": "Create Blog Post",
+          "method": "POST",
+          "path": "/api/admin/blog",
+          "description": "Create a new blog post",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "title",
+                "type": "string",
+                "required": true,
+                "description": "Post title"
+              },
+              {
+                "name": "slug",
+                "type": "string",
+                "required": true,
+                "description": "URL slug"
+              },
+              {
+                "name": "content",
+                "type": "string",
+                "required": true,
+                "description": "Post content (Markdown)"
+              },
+              {
+                "name": "excerpt",
+                "type": "string",
+                "required": false,
+                "description": "Short excerpt"
+              },
+              {
+                "name": "published",
+                "type": "boolean",
+                "required": false,
+                "description": "Publish status"
+              }
+            ],
+            "example": "{\"title\": \"My Post\", \"slug\": \"my-post\", \"content\": \"...\", \"published\": true}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Post created",
+              "example": "{\"success\": true, \"post\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-blog",
+          "name": "Update Blog Post",
+          "method": "PUT",
+          "path": "/api/admin/blog",
+          "description": "Update an existing blog post",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "id",
+                "type": "string",
+                "required": true,
+                "description": "Post ID"
+              },
+              {
+                "name": "title",
+                "type": "string",
+                "required": false,
+                "description": "New title"
+              },
+              {
+                "name": "content",
+                "type": "string",
+                "required": false,
+                "description": "New content"
+              }
+            ],
+            "example": "{\"id\": \"post-1\", \"title\": \"Updated Title\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Post updated",
+              "example": "{\"success\": true, \"post\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-delete-blog",
+          "name": "Delete Blog Post",
+          "method": "DELETE",
+          "path": "/api/admin/blog",
+          "description": "Delete a blog post",
+          "authentication": true,
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": true,
+              "location": "query",
+              "description": "Post ID to delete"
+            }
+          ],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Post deleted",
+              "example": "{\"success\": true}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-custom-pages",
+      "name": "Admin Custom Pages",
+      "description": "Manage custom content pages",
+      "icon": "FileEdit",
+      "requiresAuth": true,
+      "endpoints": [
+        {
+          "id": "admin-get-custom-pages",
+          "name": "Get All Custom Pages",
+          "method": "GET",
+          "path": "/api/admin/custom-pages",
+          "description": "Get all custom pages",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Custom pages",
+              "example": "{\"pages\": [...]}"
+            }
+          ]
+        },
+        {
+          "id": "admin-create-custom-page",
+          "name": "Create Custom Page",
+          "method": "POST",
+          "path": "/api/admin/custom-pages",
+          "description": "Create a new custom page",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "title",
+                "type": "string",
+                "required": true,
+                "description": "Page title"
+              },
+              {
+                "name": "slug",
+                "type": "string",
+                "required": true,
+                "description": "URL slug (lowercase, hyphens only)"
+              },
+              {
+                "name": "content",
+                "type": "string",
+                "required": true,
+                "description": "Page content"
+              },
+              {
+                "name": "description",
+                "type": "string",
+                "required": false,
+                "description": "Meta description"
+              },
+              {
+                "name": "published",
+                "type": "boolean",
+                "required": false,
+                "description": "Publish status"
+              }
+            ],
+            "example": "{\"title\": \"About Us\", \"slug\": \"about-us\", \"content\": \"...\", \"published\": true}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Page created",
+              "example": "{\"success\": true, \"page\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-custom-page",
+          "name": "Get Single Custom Page",
+          "method": "GET",
+          "path": "/api/admin/custom-pages/[id]",
+          "description": "Get a specific custom page by ID",
+          "authentication": true,
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": true,
+              "location": "path",
+              "description": "Page ID"
+            }
+          ],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Page data",
+              "example": "{\"page\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-custom-page",
+          "name": "Update Custom Page",
+          "method": "PUT",
+          "path": "/api/admin/custom-pages/[id]",
+          "description": "Update a custom page",
+          "authentication": true,
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": true,
+              "location": "path",
+              "description": "Page ID"
+            }
+          ],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "title",
+                "type": "string",
+                "required": false,
+                "description": "New title"
+              },
+              {
+                "name": "content",
+                "type": "string",
+                "required": false,
+                "description": "New content"
+              },
+              {
+                "name": "published",
+                "type": "boolean",
+                "required": false,
+                "description": "Publish status"
+              }
+            ],
+            "example": "{\"title\": \"Updated Title\", \"published\": true}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Page updated",
+              "example": "{\"success\": true, \"page\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-delete-custom-page",
+          "name": "Delete Custom Page",
+          "method": "DELETE",
+          "path": "/api/admin/custom-pages",
+          "description": "Delete a custom page",
+          "authentication": true,
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "required": true,
+              "location": "query",
+              "description": "Page ID to delete"
+            }
+          ],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Page deleted",
+              "example": "{\"success\": true}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-settings",
+      "name": "Admin Settings & Config",
+      "description": "Manage site settings and configurations",
+      "icon": "Cog",
+      "requiresAuth": true,
+      "endpoints": [
+        {
+          "id": "admin-get-settings",
+          "name": "Get Settings",
+          "method": "GET",
+          "path": "/api/admin/settings",
+          "description": "Get current site settings",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Site settings",
+              "example": "{\"siteName\": \"...\", \"footer\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-settings",
+          "name": "Update Settings",
+          "method": "PUT",
+          "path": "/api/admin/settings",
+          "description": "Update site settings",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "siteName",
+                "type": "string",
+                "required": false,
+                "description": "Site name"
+              }
+            ],
+            "example": "{\"siteName\": \"My Site\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Settings updated",
+              "example": "{\"success\": true, \"settings\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-site-config",
+          "name": "Get Site Config",
+          "method": "GET",
+          "path": "/api/admin/site-config",
+          "description": "Get site configuration (branding, SEO)",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Site config",
+              "example": "{\"siteName\": \"...\", \"logo\": \"...\", \"favicon\": \"...\"}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-site-config",
+          "name": "Update Site Config",
+          "method": "POST",
+          "path": "/api/admin/site-config",
+          "description": "Update site configuration",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "siteName",
+                "type": "string",
+                "required": false,
+                "description": "Site name"
+              },
+              {
+                "name": "siteDescription",
+                "type": "string",
+                "required": false,
+                "description": "Site description"
+              }
+            ],
+            "example": "{\"siteName\": \"Updated Name\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Config updated",
+              "example": "{\"success\": true, \"message\": \"Site configuration updated successfully\"}"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-theme-config",
+          "name": "Get Theme Config",
+          "method": "GET",
+          "path": "/api/admin/theme-config",
+          "description": "Get theme configuration",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Theme config",
+              "example": "{\"primaryColor\": \"#...\", \"background\": \"...\"}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-theme-config",
+          "name": "Update Theme Config",
+          "method": "POST",
+          "path": "/api/admin/theme-config",
+          "description": "Update theme configuration",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "primaryColor",
+                "type": "string",
+                "required": false,
+                "description": "Primary theme color"
+              }
+            ],
+            "example": "{\"primaryColor\": \"#8B5CF6\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Theme updated",
+              "example": "{\"success\": true, \"message\": \"Theme configuration updated successfully\"}"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-system-config",
+          "name": "Get System Config",
+          "method": "GET",
+          "path": "/api/admin/system-config",
+          "description": "Get system configuration (session, API endpoints)",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "System config",
+              "example": "{\"sessionSecret\": \"...\", \"adminUsername\": \"...\", \"emoteApiEndpoint\": \"...\"}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-system-config",
+          "name": "Update System Config",
+          "method": "PUT",
+          "path": "/api/admin/system-config",
+          "description": "Update system configuration including admin credentials",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "sessionSecret",
+                "type": "string",
+                "required": false,
+                "description": "Session secret (min 32 chars)"
+              },
+              {
+                "name": "adminUsername",
+                "type": "string",
+                "required": false,
+                "description": "Admin username (min 3 chars)"
+              },
+              {
+                "name": "newPassword",
+                "type": "string",
+                "required": false,
+                "description": "New admin password (min 6 chars)"
+              },
+              {
+                "name": "emoteApiEndpoint",
+                "type": "string",
+                "required": false,
+                "description": "External emote API endpoint"
+              }
+            ],
+            "example": "{\"emoteApiEndpoint\": \"https://api.example.com\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Config updated",
+              "example": "{\"success\": true}"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-razorpay-config",
+          "name": "Get Razorpay Config",
+          "method": "GET",
+          "path": "/api/admin/razorpay-config",
+          "description": "Get Razorpay payment configuration (secrets masked)",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Razorpay config",
+              "example": "{\"enabled\": true, \"keyId\": \"rzp_xxx\", \"keySecret\": \"********\"}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-razorpay-config",
+          "name": "Update Razorpay Config",
+          "method": "POST",
+          "path": "/api/admin/razorpay-config",
+          "description": "Update Razorpay payment configuration",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "enabled",
+                "type": "boolean",
+                "required": false,
+                "description": "Enable/disable payments"
+              },
+              {
+                "name": "keyId",
+                "type": "string",
+                "required": false,
+                "description": "Razorpay Key ID"
+              },
+              {
+                "name": "keySecret",
+                "type": "string",
+                "required": false,
+                "description": "Razorpay Key Secret"
+              },
+              {
+                "name": "webhookSecret",
+                "type": "string",
+                "required": false,
+                "description": "Webhook secret"
+              }
+            ],
+            "example": "{\"enabled\": true, \"keyId\": \"rzp_live_xxx\"}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Config updated",
+              "example": "{\"success\": true}"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-developer-settings",
+          "name": "Get Developer Settings",
+          "method": "GET",
+          "path": "/api/admin/developer-settings",
+          "description": "Get custom code injection settings",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Developer settings",
+              "example": "{\"headerCode\": \"...\", \"footerCode\": \"...\", \"customCss\": \"...\", \"enabled\": true}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-developer-settings",
+          "name": "Update Developer Settings",
+          "method": "PUT",
+          "path": "/api/admin/developer-settings",
+          "description": "Update custom code injection (HTML, CSS, JS)",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "headerCode",
+                "type": "string",
+                "required": false,
+                "description": "HTML to inject in header"
+              },
+              {
+                "name": "footerCode",
+                "type": "string",
+                "required": false,
+                "description": "HTML to inject in footer"
+              },
+              {
+                "name": "customCss",
+                "type": "string",
+                "required": false,
+                "description": "Custom CSS"
+              },
+              {
+                "name": "customJs",
+                "type": "string",
+                "required": false,
+                "description": "Custom JavaScript"
+              },
+              {
+                "name": "enabled",
+                "type": "boolean",
+                "required": false,
+                "description": "Enable custom code"
+              }
+            ],
+            "example": "{\"customCss\": \"body { background: #000; }\", \"enabled\": true}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Settings updated",
+              "example": "{\"success\": true, \"settings\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-footer-config",
+          "name": "Get Footer Config",
+          "method": "GET",
+          "path": "/api/admin/footer-config",
+          "description": "Get footer configuration",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Footer config",
+              "example": "{\"companyInfo\": {...}, \"sections\": [...], \"socialLinks\": [...]}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-footer-config",
+          "name": "Update Footer Config",
+          "method": "POST",
+          "path": "/api/admin/footer-config",
+          "description": "Update footer configuration",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "companyInfo",
+                "type": "object",
+                "required": false,
+                "description": "Company info section"
+              },
+              {
+                "name": "sections",
+                "type": "array",
+                "required": false,
+                "description": "Footer link sections"
+              },
+              {
+                "name": "socialLinks",
+                "type": "array",
+                "required": false,
+                "description": "Social media links"
+              }
+            ],
+            "example": "{\"companyInfo\": {\"name\": \"My Company\", \"description\": \"...\"}}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Footer updated",
+              "example": "{\"success\": true}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-floating-nav",
+          "name": "Update Floating Nav",
+          "method": "POST",
+          "path": "/api/admin/floating-nav",
+          "description": "Update floating navigation settings",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "enabled",
+                "type": "boolean",
+                "required": false,
+                "description": "Enable floating nav"
+              },
+              {
+                "name": "items",
+                "type": "array",
+                "required": false,
+                "description": "Nav items"
+              }
+            ],
+            "example": "{\"enabled\": true}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Updated",
+              "example": "{\"success\": true, \"message\": \"Floating Nav settings updated successfully\"}"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-pages-config",
+          "name": "Get Pages Config",
+          "method": "GET",
+          "path": "/api/admin/pages-config",
+          "description": "Get pages visibility configuration",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Pages config",
+              "example": "{\"features\": {\"enabled\": true}, \"premium\": {\"enabled\": true}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-pages-config",
+          "name": "Update Pages Config",
+          "method": "POST",
+          "path": "/api/admin/pages-config",
+          "description": "Update pages visibility settings",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "features",
+                "type": "object",
+                "required": false,
+                "description": "Features page settings"
+              },
+              {
+                "name": "premium",
+                "type": "object",
+                "required": false,
+                "description": "Premium page settings"
+              }
+            ],
+            "example": "{\"features\": {\"enabled\": false}}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Config updated",
+              "example": "{\"success\": true, \"message\": \"Pages configuration updated successfully\"}"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-content",
+          "name": "Get Content",
+          "method": "GET",
+          "path": "/api/admin/content",
+          "description": "Get homepage content configuration",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Content data",
+              "example": "{\"hero\": {...}, \"features\": [...], \"cta\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-update-content",
+          "name": "Update Content",
+          "method": "PUT",
+          "path": "/api/admin/content",
+          "description": "Update homepage content",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "hero",
+                "type": "object",
+                "required": false,
+                "description": "Hero section content"
+              },
+              {
+                "name": "features",
+                "type": "array",
+                "required": false,
+                "description": "Features list"
+              }
+            ],
+            "example": "{\"hero\": {\"title\": \"Welcome\", \"subtitle\": \"...\"}}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Content updated",
+              "example": "{\"success\": true, \"content\": {...}}"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-public-config",
+          "name": "Get Public Config",
+          "method": "GET",
+          "path": "/api/admin/public-config",
+          "description": "Get public configuration (AdSense ID)",
+          "authentication": false,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Public config",
+              "example": "{\"adsenseClientId\": \"ca-pub-xxx\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-logs",
+      "name": "Admin Logs & Audit",
+      "description": "View system logs and audit trails",
+      "icon": "FileSearch",
+      "requiresAuth": true,
+      "endpoints": [
+        {
+          "id": "admin-get-logs",
+          "name": "Get Emote Logs",
+          "method": "GET",
+          "path": "/api/admin/logs",
+          "description": "Get emote sending logs",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Logs",
+              "example": "[{\"timestamp\": \"...\", \"ip\": \"...\", \"uid\": \"...\", \"emoteCode\": \"...\", \"success\": true}]"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-audit-logs",
+          "name": "Get Audit Logs",
+          "method": "GET",
+          "path": "/api/admin/audit-logs",
+          "description": "Get admin action audit logs",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Audit logs",
+              "example": "[{\"action\": \"update\", \"type\": \"settings\", \"user\": \"admin\", \"timestamp\": \"...\"}]"
+            }
+          ]
+        },
+        {
+          "id": "admin-get-payment-logs",
+          "name": "Get Payment Logs",
+          "method": "GET",
+          "path": "/api/admin/payment-logs",
+          "description": "Get payment transaction logs",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Payment logs",
+              "example": "{\"payments\": [{\"orderId\": \"...\", \"uid\": \"...\", \"status\": \"success\", \"amount\": 99}]}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-backup",
+      "name": "Admin Backup & Restore",
+      "description": "Export and import system backups",
+      "icon": "Database",
+      "requiresAuth": true,
+      "endpoints": [
+        {
+          "id": "admin-export-backup",
+          "name": "Export Backup",
+          "method": "GET",
+          "path": "/api/admin/backup/export",
+          "description": "Download complete system backup as JSON file",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": null,
+          "responses": [
+            {
+              "status": 200,
+              "description": "Backup file download",
+              "example": "JSON file attachment"
+            }
+          ]
+        },
+        {
+          "id": "admin-import-backup",
+          "name": "Import Backup",
+          "method": "POST",
+          "path": "/api/admin/backup/import",
+          "description": "Restore system from backup file",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "json",
+            "fields": [
+              {
+                "name": "backup",
+                "type": "object",
+                "required": true,
+                "description": "Full backup JSON object"
+              }
+            ],
+            "example": "{...backup data...}"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "Backup restored",
+              "example": "{\"success\": true, \"restored\": [\"emotes\", \"settings\", \"whitelist\"], \"errors\": []}"
+            },
+            {
+              "status": 400,
+              "description": "Invalid backup",
+              "example": "{\"error\": \"Invalid backup file\", \"details\": [...]}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-upload",
+      "name": "Admin File Upload",
+      "description": "Upload files (logo, favicon)",
+      "icon": "Upload",
+      "requiresAuth": true,
+      "endpoints": [
+        {
+          "id": "admin-upload-file",
+          "name": "Upload File",
+          "method": "POST",
+          "path": "/api/admin/upload",
+          "description": "Upload logo or favicon image (max 1MB)",
+          "authentication": true,
+          "parameters": [],
+          "requestBody": {
+            "type": "multipart",
+            "fields": [
+              {
+                "name": "file",
+                "type": "file",
+                "required": true,
+                "description": "Image file to upload"
+              },
+              {
+                "name": "type",
+                "type": "string",
+                "required": true,
+                "description": "Upload type: 'logo' or 'favicon'"
+              }
+            ],
+            "example": "FormData with file and type"
+          },
+          "responses": [
+            {
+              "status": 200,
+              "description": "File uploaded",
+              "example": "{\"success\": true, \"url\": \"/uploads/logo/logo-xxx.png\", \"filename\": \"logo-xxx.png\"}"
+            },
+            {
+              "status": 400,
+              "description": "Invalid file",
+              "example": "{\"error\": \"File size must be less than 1MB\"}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
